@@ -1,7 +1,5 @@
 ﻿using HolidaySearch.Models;
 using HolidaySearch.Services;
-using HolidaySearch.Services.Interfaces;
-using Moq;
 using Newtonsoft.Json;
 
 namespace HolidaySearch.Tests.Data
