@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HolidaySearch.Models;
+using Newtonsoft.Json;
 
 namespace HolidaySearch.Tests.Data
 {
@@ -8,7 +9,7 @@ namespace HolidaySearch.Tests.Data
         public async Task Load_ValidHotelJson_ReturnsHotelObjects()
         {
             //Arrange
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "hotels.json");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data/hotels.json");
             string flightJson = await File.ReadAllTextAsync(filePath);
 
             //Act
@@ -43,7 +44,7 @@ namespace HolidaySearch.Tests.Data
             string invalidHotelJson = "[{ not valid }]";
 
             //Act & Assert
-            Assert.Throws<JsonException>(() =>
+            Assert.Throws<JsonReaderException>(() =>
             {
                 JsonConvert.DeserializeObject<List<Hotel>>(invalidHotelJson);
             });
