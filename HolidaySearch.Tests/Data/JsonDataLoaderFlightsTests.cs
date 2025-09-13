@@ -1,4 +1,7 @@
 ﻿using HolidaySearch.Models;
+using HolidaySearch.Services;
+using HolidaySearch.Services.Interfaces;
+using Moq;
 using Newtonsoft.Json;
 
 namespace HolidaySearch.Tests.Data
@@ -9,11 +12,10 @@ namespace HolidaySearch.Tests.Data
         public async Task Load_ValidFlightJson_ReturnsFlightObjects()
         {
             //Arrange
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data/flights.json");
-            string flightJson = await File.ReadAllTextAsync(filePath);
+            var jsonDataLoaderService = new JsonDataLoaderService();
 
             //Act
-            var parsedFlights = JsonConvert.DeserializeObject<List<Flight>>(flightJson);
+            var parsedFlights = await jsonDataLoaderService.LoadAllAsync<Flight>("Data/flights.json");
 
             //Assert
             Assert.NotNull(parsedFlights);
@@ -26,10 +28,11 @@ namespace HolidaySearch.Tests.Data
         public void Load_EmptyFlightJson_ReturnsEmptyCollectionFlightObjects()
         {
             //Arrange
+            var jsonDataLoaderService = new JsonDataLoaderService();
             string emptyFlightJson = "[]";
 
             //Act
-            var parsedFlights = JsonConvert.DeserializeObject<List<Flight>>(emptyFlightJson);
+            var parsedFlights = jsonDataLoaderService.LoadAllFromString<Flight>(emptyFlightJson);
 
             //Assert
             Assert.NotNull(parsedFlights);
@@ -41,12 +44,13 @@ namespace HolidaySearch.Tests.Data
         public void Load_InvalidFlightJson_ThrowsException()
         {
             //Arrange
+            var jsonDataLoaderService = new JsonDataLoaderService();
             string invalidFlightJson = "[{ not valid }]";
 
             //Act & Assert
-            Assert.Throws<JsonReaderException>(() =>
+            Assert.Throws<JsonException>(() =>
             {
-                JsonConvert.DeserializeObject<List<Flight>>(invalidFlightJson);
+                jsonDataLoaderService.LoadAllFromString<Flight>(invalidFlightJson);
             });
         }
 
