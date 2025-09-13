@@ -1,4 +1,5 @@
 ﻿using HolidaySearch.Models;
+using HolidaySearch.Services;
 using Newtonsoft.Json;
 
 namespace HolidaySearch.Tests.Data
@@ -9,11 +10,10 @@ namespace HolidaySearch.Tests.Data
         public async Task Load_ValidHotelJson_ReturnsHotelObjects()
         {
             //Arrange
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data/hotels.json");
-            string flightJson = await File.ReadAllTextAsync(filePath);
+            var jsonDataLoaderService = new JsonDataLoaderService();
 
             //Act
-            var parsedHotels = JsonConvert.DeserializeObject<List<Hotel>>(flightJson);
+            var parsedHotels = await jsonDataLoaderService.LoadAllAsync<Hotel>("Data/hotels.json");
 
             //Assert
             Assert.NotNull(parsedHotels);
@@ -23,13 +23,14 @@ namespace HolidaySearch.Tests.Data
         }
 
         [Fact]
-        public async Task Load_EmptyHotelJson_ReturnsEmptyCollectionHotelObjects()
+        public void Load_EmptyHotelJson_ReturnsEmptyCollectionHotelObjects()
         {
             //Arrange
+            var jsonDataLoaderService = new JsonDataLoaderService();
             string emptyHotelJson = "[]";
 
             //Act
-            var parsedHotels = JsonConvert.DeserializeObject<List<Hotel>>(emptyHotelJson);
+            var parsedHotels = jsonDataLoaderService.LoadAllFromString<Hotel>(emptyHotelJson);
 
             //Assert
             Assert.NotNull(parsedHotels);
@@ -41,12 +42,13 @@ namespace HolidaySearch.Tests.Data
         public void Load_InvalidHotelJson_ThrowsException()
         {
             //Arrange
+            var jsonDataLoaderService = new JsonDataLoaderService();
             string invalidHotelJson = "[{ not valid }]";
 
             //Act & Assert
-            Assert.Throws<JsonReaderException>(() =>
+            Assert.Throws<JsonException>(() =>
             {
-                JsonConvert.DeserializeObject<List<Hotel>>(invalidHotelJson);
+                jsonDataLoaderService.LoadAllFromString<Hotel>(invalidHotelJson);
             });
         }
 
