@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HolidaySearch.Models;
+using Newtonsoft.Json;
 
 namespace HolidaySearch.Tests.Data
 {
@@ -8,7 +9,7 @@ namespace HolidaySearch.Tests.Data
         public async Task Load_ValidFlightJson_ReturnsFlightObjects()
         {
             //Arrange
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flights.json");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data/flights.json");
             string flightJson = await File.ReadAllTextAsync(filePath);
 
             //Act
@@ -22,7 +23,7 @@ namespace HolidaySearch.Tests.Data
         }
 
         [Fact]
-        public async Task Load_EmptyFlightJson_ReturnsEmptyCollectionFlightObjects()
+        public void Load_EmptyFlightJson_ReturnsEmptyCollectionFlightObjects()
         {
             //Arrange
             string emptyFlightJson = "[]";
