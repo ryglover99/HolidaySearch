@@ -19,6 +19,16 @@ namespace HolidaySearch.Services
         private async Task<List<Hotel>> LoadAllHotels()
             => await _jsonDataLoaderService.LoadAllAsync<Hotel>(HOTEL_DATA_PATH);
 
+        private bool isValidFlight(Flight flight, HolidaySearchRequest request)
+            =>  request.DepartingFrom.Contains(flight.From) &&
+                flight.To == request.TravelingTo &&
+                flight.DepartureDate >= request.DepartureDate;
+
+        private bool isValidHotel(Hotel hotel, Flight flight, HolidaySearchRequest request)
+            =>  hotel.LocalAirports.Contains(flight.To) &&
+                hotel.ArrivalDate >= request.DepartureDate &&
+                hotel.Nights == request.Duration;
+
         public async Task<HolidaySearchResponse> SearchAsync(HolidaySearchRequest request)
         {
             HolidaySearchResponse response = new HolidaySearchResponse();
@@ -35,23 +45,13 @@ namespace HolidaySearch.Services
 
             List<HolidayPackage> packageHolidays = [];
 
-            foreach (var flight in flights)
+            foreach (var flight in flights.Where(f => isValidFlight(f, request)))
             {
-                //Check for valid flight
-                if (!request.DepartingFrom.Contains(flight.From)) continue;
-                if (flight.To != request.TravelingTo) continue;
-                if (flight.DepartureDate < request.DepartureDate) continue;
-
                 var daysDiff = Math.Abs((flight.DepartureDate.DayNumber - request.DepartureDate.DayNumber));
                 var dateScore = 100.0 / (1 + daysDiff);
 
-                foreach (var hotel in hotels)
+                foreach (var hotel in hotels.Where(h => isValidHotel(h, flight, request)))
                 {
-                    //Check for valid hotel
-                    if (!hotel.LocalAirports.Contains(flight.To)) continue;
-                    if (hotel.ArrivalDate < request.DepartureDate) continue;
-                    if (hotel.Nights != request.Duration) continue;
-
                     var totalPrice = flight.Price + (hotel.PricePerNight * request.Duration);
                     var priceScore = 1000.0 / (1 + totalPrice);
 
