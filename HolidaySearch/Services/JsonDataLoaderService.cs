@@ -5,7 +5,7 @@ namespace HolidaySearch.Services
 {
     public class JsonDataLoaderService : IJsonDataLoaderService
     {
-        private List<T> DeserializeJsonIntoCollectionOfObject<T>(string? filePath, string json) where T : class
+        private List<T> DeserializeJsonIntoCollectionOfObjects<T>(string? filePath, string json) where T : class
         {
             if (string.IsNullOrEmpty(json))
                 return new List<T>();
@@ -39,13 +39,13 @@ namespace HolidaySearch.Services
 
             string json = await File.ReadAllTextAsync(fullFilePath);
 
-            return DeserializeJsonIntoCollectionOfObject<T>(filePath, json) ?? new List<T>();
+            return DeserializeJsonIntoCollectionOfObjects<T>(filePath, json) ?? new List<T>();
 
         }
 
         public List<T> LoadAllFromString<T>(string json) where T : class
         {
-            return DeserializeJsonIntoCollectionOfObject<T>(filePath: null, json) ?? new List<T>();
+            return DeserializeJsonIntoCollectionOfObjects<T>(filePath: null, json) ?? new List<T>();
         }
     }
 }
