@@ -5,5 +5,6 @@
         public Flight Flight { get; set; }
         public Hotel Hotel { get; set; }
         public double TotalPrice { get; set; }
+        public double BestValueScore { get; set; }
     }
 }

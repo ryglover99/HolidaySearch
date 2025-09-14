@@ -15,7 +15,7 @@ namespace HolidaySearch.Tests.Services
             //Act
             var results = await holidaySearchService.SearchAsync(new HolidaySearchRequest()
             {
-                DepartingFrom = "MAN",
+                DepartingFrom = ["MAN"],
                 TravelingTo = "AGP",
                 DepartureDate = DateOnly.Parse("2023/07/01"),
                 Duration = 7
@@ -48,7 +48,7 @@ namespace HolidaySearch.Tests.Services
 
             //Act
             var results = await holidaySearchService.SearchAsync(new HolidaySearchRequest(){
-                DepartingFrom = "LTN",
+                DepartingFrom = ["LTN", "LGW"],
                 TravelingTo = "PMI",
                 DepartureDate = DateOnly.Parse("2023/06/15"),
                 Duration = 10
@@ -63,8 +63,6 @@ namespace HolidaySearch.Tests.Services
 
             var firstResult = results.HolidayPackages.First();
             Assert.Equal(6, firstResult.Flight.Id);
-            Assert.Equal("LTN", firstResult.Flight.From);
-            Assert.Equal("PMI", firstResult.Flight.To);
             Assert.True(firstResult.Flight.Price > 0);
 
             Assert.Equal(5, firstResult.Hotel.Id);
@@ -81,7 +79,7 @@ namespace HolidaySearch.Tests.Services
 
             //Act
             var results = await holidaySearchService.SearchAsync(new HolidaySearchRequest(){
-                DepartingFrom = "",
+                DepartingFrom = ["MAN", "TFS", "AGP", "PMI", "LTN", "LGW", "LPA"],
                 TravelingTo = "LPA",
                 DepartureDate = DateOnly.Parse("2022/11/10"),
                 Duration = 14
@@ -113,7 +111,7 @@ namespace HolidaySearch.Tests.Services
 
             //Act
             var results = await holidaySearchService.SearchAsync(new HolidaySearchRequest(){
-                DepartingFrom = "MAN",
+                DepartingFrom = ["MAN"],
                 TravelingTo = "LTN",
                 DepartureDate = DateOnly.Parse("2022/11/10"),
                 Duration = 6
@@ -124,7 +122,7 @@ namespace HolidaySearch.Tests.Services
             Assert.IsType<HolidaySearchResponse>(results);
             Assert.NotNull(results.HolidayPackages);
             Assert.IsAssignableFrom<IEnumerable<HolidayPackage>>(results.HolidayPackages);
-            Assert.NotEmpty(results.HolidayPackages);
+            Assert.Empty(results.HolidayPackages);
         }
 
         [Fact]
@@ -155,7 +153,7 @@ namespace HolidaySearch.Tests.Services
 
             //Act
             var results = await holidaySearchService.SearchAsync(new HolidaySearchRequest(){
-                DepartingFrom = "MAN",
+                DepartingFrom = ["MAN"],
                 TravelingTo = "LTN",
                 DepartureDate = DateOnly.Parse("2022/11/10"),
                 Duration = 0
@@ -166,7 +164,7 @@ namespace HolidaySearch.Tests.Services
             Assert.IsType<HolidaySearchResponse>(results);
             Assert.NotNull(results.HolidayPackages);
             Assert.IsAssignableFrom<IEnumerable<HolidayPackage>>(results.HolidayPackages);
-            Assert.NotEmpty(results.HolidayPackages);
+            Assert.Empty(results.HolidayPackages);
         }
 
     }

@@ -38,9 +38,12 @@ namespace HolidaySearch.Services
             foreach (var flight in flights)
             {
                 //Check for valid flight
-                if (flight.From != request.DepartingFrom) continue;
+                if (!request.DepartingFrom.Contains(flight.From)) continue;
                 if (flight.To != request.TravelingTo) continue;
                 if (flight.DepartureDate < request.DepartureDate) continue;
+
+                var daysDiff = Math.Abs((flight.DepartureDate.DayNumber - request.DepartureDate.DayNumber));
+                var dateScore = 100.0 / (1 + daysDiff);
 
                 foreach (var hotel in hotels)
                 {
@@ -49,16 +52,23 @@ namespace HolidaySearch.Services
                     if (hotel.ArrivalDate < request.DepartureDate) continue;
                     if (hotel.Nights != request.Duration) continue;
 
+                    var totalPrice = flight.Price + (hotel.PricePerNight * request.Duration);
+                    var priceScore = 1000.0 / (1 + totalPrice);
+
+                    var arrivalDaysDiff = Math.Abs((hotel.ArrivalDate.DayNumber - request.DepartureDate.DayNumber));
+                    var arrivalDateScore = 100.0 / (1 + arrivalDaysDiff);
+
                     packageHolidays.Add(new HolidayPackage()
                     {
                         Flight = flight,
                         Hotel = hotel,
-                        TotalPrice = flight.Price + (hotel.PricePerNight * request.Duration)
+                        TotalPrice = flight.Price + (hotel.PricePerNight * request.Duration),
+                        BestValueScore = dateScore + priceScore
                     });
                 }
             }
 
-            response.HolidayPackages = packageHolidays.OrderBy(p => p.TotalPrice);
+            response.HolidayPackages = packageHolidays.OrderByDescending(p => p.BestValueScore);
 
             return response;
 

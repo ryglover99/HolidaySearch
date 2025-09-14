@@ -2,7 +2,7 @@
 {
     public class HolidaySearchRequest
     {
-        public string DepartingFrom { get; set; } = string.Empty;
+        public string[] DepartingFrom { get; set; } = [];
         public string TravelingTo { get; set; } = string.Empty;
         public DateOnly DepartureDate { get; set; }
         public int Duration { get; set; }
