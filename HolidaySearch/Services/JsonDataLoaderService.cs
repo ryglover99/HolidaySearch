@@ -5,28 +5,9 @@ namespace HolidaySearch.Services
 {
     public class JsonDataLoaderService : IJsonDataLoaderService
     {
-
-        public async Task<List<T>> LoadAllAsync<T>(string filePath) where T : class
-        {
-            string fullFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filePath);
-
-            if (!File.Exists(fullFilePath))
-                throw new FileNotFoundException($"File not found: {fullFilePath}");
-
-            string json = await File.ReadAllTextAsync(fullFilePath);
-
-            return DeserializeJsonIntoCollectionOfObject<T>(filePath, json) ?? new List<T>();
-
-        }
-
-        public List<T> LoadAllFromString<T>(string json) where T : class
-        {
-            return DeserializeJsonIntoCollectionOfObject<T>(filePath: null, json) ?? new List<T>();
-        }
-
         private List<T> DeserializeJsonIntoCollectionOfObject<T>(string? filePath, string json) where T : class
         {
-            if(string.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(json))
                 return new List<T>();
 
             try
@@ -47,6 +28,24 @@ namespace HolidaySearch.Services
                 string locationInfo = filePath != null ? $"json at '{filePath}'" : string.Empty;
                 throw new JsonException($"JSON was invalid while attempting to deserialize {locationInfo} with object {typeof(T)}", ex);
             }
+        }
+
+        public async Task<List<T>> LoadAllAsync<T>(string filePath) where T : class
+        {
+            string fullFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filePath);
+
+            if (!File.Exists(fullFilePath))
+                throw new FileNotFoundException($"File not found: {fullFilePath}");
+
+            string json = await File.ReadAllTextAsync(fullFilePath);
+
+            return DeserializeJsonIntoCollectionOfObject<T>(filePath, json) ?? new List<T>();
+
+        }
+
+        public List<T> LoadAllFromString<T>(string json) where T : class
+        {
+            return DeserializeJsonIntoCollectionOfObject<T>(filePath: null, json) ?? new List<T>();
         }
     }
 }

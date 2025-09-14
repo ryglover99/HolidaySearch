@@ -29,6 +29,20 @@ namespace HolidaySearch.Services
                 hotel.ArrivalDate >= request.DepartureDate &&
                 hotel.Nights == request.Duration;
 
+        private double CalculateBestValueScore(Flight flight, Hotel hotel, HolidaySearchRequest request)
+        {
+            var flightDaysDiff = Math.Abs((flight.DepartureDate.DayNumber - request.DepartureDate.DayNumber));
+            var flightDateScore = 100.0 / (1 + flightDaysDiff);
+
+            var totalPrice = flight.Price + (hotel.PricePerNight * request.Duration);
+            var priceScore = 1000.0 / (1 + totalPrice);
+
+            var hotelDaysDiff = Math.Abs((hotel.ArrivalDate.DayNumber - request.DepartureDate.DayNumber));
+            var hotelDateScore = 100.0 / (1 + hotelDaysDiff);
+
+            return flightDateScore + priceScore + hotelDateScore;
+        }
+
         public async Task<HolidaySearchResponse> SearchAsync(HolidaySearchRequest request)
         {
             HolidaySearchResponse response = new HolidaySearchResponse();
@@ -47,23 +61,14 @@ namespace HolidaySearch.Services
 
             foreach (var flight in flights.Where(f => isValidFlight(f, request)))
             {
-                var daysDiff = Math.Abs((flight.DepartureDate.DayNumber - request.DepartureDate.DayNumber));
-                var dateScore = 100.0 / (1 + daysDiff);
-
                 foreach (var hotel in hotels.Where(h => isValidHotel(h, flight, request)))
                 {
-                    var totalPrice = flight.Price + (hotel.PricePerNight * request.Duration);
-                    var priceScore = 1000.0 / (1 + totalPrice);
-
-                    var arrivalDaysDiff = Math.Abs((hotel.ArrivalDate.DayNumber - request.DepartureDate.DayNumber));
-                    var arrivalDateScore = 100.0 / (1 + arrivalDaysDiff);
-
                     packageHolidays.Add(new HolidayPackage()
                     {
                         Flight = flight,
                         Hotel = hotel,
                         TotalPrice = flight.Price + (hotel.PricePerNight * request.Duration),
-                        BestValueScore = dateScore + priceScore
+                        BestValueScore = CalculateBestValueScore(flight, hotel, request)
                     });
                 }
             }
